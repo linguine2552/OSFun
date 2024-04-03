@@ -1,0 +1,612 @@
+<!DOCTYPE html> <html lang="en">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            margin-bottom: 10px;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }		
+    </style>
+ <head>
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Operating Systems Concepts</title> 
+ </head> 
+ <body> 
+ <h1>Powers of 2 Table:</h1> <table> <tr> <th>X</th> <th>0</th> <th>1</th> <th>2</th> <th>3</th> <th>4</th> <th>5</th> <th>6</th> <th>7</th> <th>8</th> <th>9</th> <th>10</th> <th>11</th> <th>12</th> <th>13</th> <th>14</th> <th>15</th> <th>16</th> </tr> <tr> <th>2^X</th> <td>1</td> <td>2</td> <td>4</td> <td>8</td> <td>16</td> <td>32</td> <td>64</td> <td>128</td> <td>256</td> <td>512</td> <td>1024</td> <td>2048</td> <td>4096</td> <td>8192</td> <td>16384</td> <td>32768</td> <td>65536</td> </tr> </table> 
+ <h1>Introduction:</h1> <p>In the early days of computing, businesses used batch processing models. Programs were written on punch cards by (often female) operators/programmers. The stack of cards would then be submitted to run on the computer, which could take hours or overnight. The programmer would get the results back the next day and hope there were no errors. If there were bugs, they'd have to fix the cards and resubmit the job, repeating the slow turnaround process. This inefficient process motivated the development of interactive computing, time-sharing systems and ultimately personal computers.</p>
+
+<section> <h2>Chapter 2 - Introduction</h2> <h3>When a program executes an instruction</h3> <ol> <li>Fetch instruction from memory</li> <li>Decodes the instruction into readable machine language</li> <li>Execute the decoded instruction</li> <li>Processor moves to Next instruction <ul> <li>The processor's instruction cycle consists of these basic steps to execute each instruction in a program.</li> </ul> </li> </ol> <h3>Responsibilities of the OS</h3> <ul> <li>Easy to run programs <ul> <li>The OS provides a user-friendly interface and abstracts complex hardware details.</li> </ul> </li> <li>Allow programs to share the memory space <ul> <li>The OS manages memory allocation and protection to enable multiple programs to reside in memory concurrently.</li> </ul> </li> <li>Enable programs to interact with (I/O) devices <ul> <li>The OS provides device drivers and standard APIs for programs to access I/O devices like storage, networking, and peripherals.</li> </ul> </li> <li>Ensure that the system operates efficiently and correctly <ul> <li>The OS optimizes resource utilization, enforces security and access controls, and maintains overall system stability.</li> </ul> </li> </ul> <h3>Virtualization</h3> <ul> <li>Transformation of a physical resource into a virtual form <ul> <li>Virtual is more general, powerful, &amp; easy to use</li> </ul> </li> <li>Key concepts: <ul> <li>CPU virtualization: The OS abstracts the physical CPU into virtual CPUs, allowing multiple programs to run concurrently and share CPU time.</li> <li>Memory virtualization: The OS provides each program with its own virtual address space, abstracting physical memory placement and enabling memory protection between processes.</li> <li>Device virtualization: The OS presents a standardized and simplified view of I/O devices to programs, handling the complexity of physical device interaction.</li> </ul> </li> </ul> <h3>System Call</h3> <ul> <li>Allows user to tell the OS to do stuff <ul> <li>Provides a controlled and secure way for user programs to request OS services and access protected resources.</li> </ul> </li> <li>OS provides an interface <ul> <li>Typically has a few hundred system calls</li> <li>Examples: <ul> <li>Running Programs: creating and managing processes</li> <li>Accessing Memory: allocating, freeing memory</li> <li>Accessing devices: performing I/O operations</li> </ul> </li> <li>System calls define the boundary between user mode and kernel mode execution.</li> </ul> </li> </ul> <h3>Resource Manager</h3> <ul> <li>OS manages hardware resources <ul> <li>CPU, Memory, Disk, I/O Devices</li> </ul> </li> <li>OS orchestrates resource sharing among programs: <ul> <li>CPU scheduling: Allowing programs to share the CPU fairly and efficiently in a time-multiplexed fashion</li> <li>Memory management: Allocating and managing memory for each process, providing isolation and protection</li> <li>Disk &amp; I/O management: Coordinating access to storage and devices, optimizing performance, and handling I/O requests</li> </ul> </li> <li>The OS must balance competing demands for limited resources while maintaining responsiveness, performance, and stability.</li> </ul> <h3>Virtualizing the CPU</h3> <ul> <li>The OS turns a single physical CPU into a seemingly infinite number of CPUs <ul> <li>Allows many programs to seemingly run at once</li> <li>The OS rapidly switches between active processes, giving each a brief time slice of CPU execution</li> <li>This creates the illusion of concurrent execution while actually interleaving the execution of processes</li> </ul> </li> <li>The OS must save and restore process state during switches and handle interrupts transparently to processes.</li> </ul> <h3>Virtualizing Memory</h3> <ul> <li>Physical memory is an array of bytes</li> <li>A program keeps all of its data structures in memory <ul> <li>Read memory: Specifies an address to able to access data</li> <li>Write Memory: Specifies data to be written at a given address</li> </ul> </li> <li>Each process has its own private virtual address space <ul> <li>OS maps virtual addresses to physical memory locations</li> <li>Memory references within one process don't affect other processes' address spaces</li> <li>This provides isolation, security, and simplified memory management for processes</li> </ul> </li> <li>Physical memory is a shared resource managed by the OS <ul> <li>The OS tracks free and allocated physical pages</li> <li>It handles allocation, placement, and optimizes usage to maximize performance</li> </ul> </li> </ul> <h3>Issue with Concurrency</h3> <ul> <li>OS juggles many things at once <ul> <li>Order of process execution is interleaved and not fully deterministic <ul> <li>Instructions do not execute atomically, leading to potential race conditions or synchronization issues</li> </ul> </li> </ul> </li> <li>Modern multi-threaded programs also face the concurrency problem <ul> <li>Shared memory access from multiple threads can lead to data races or inconsistencies</li> <li>The OS must provide synchronization primitives like locks, semaphores to coordinate concurrent access</li> <li>Developers must carefully design and synchronize multi-threaded programs to avoid concurrency bugs</li> </ul> </li> </ul> <h3>Persistence</h3> <ul> <li>DRAM stores values in a volatile state <ul> <li>Contents are lost when power is removed</li> </ul> </li> <li>Hardware &amp; software are needed to persistently store data <ul> <li>Hardware: long-term storage devices like hard disks or SSDs <ul> <li>Non-volatile, retain data across power cycles</li> </ul> </li> <li>Software: File systems <ul> <li>Organize, track and manage data stored on persistent storage devices</li> </ul> </li> </ul> </li> <li>Writing to persistent storage is more complex than memory <ul> <li>Slower I/O performance compared to memory access</li> <li>Potential failure modes: system crashes, power loss during updates</li> </ul> </li> <li>The OS File System is responsible for: <ul> <li>Allocating and freeing storage blocks for files and directories</li> <li>Choosing an appropriate on-disk data structure and layout</li> <li>Maintaining metadata like access permissions, timestamps, etc.</li> <li>Handling crashes and ensuring data consistency <ul> <li>Through journaling, copy-on-write, or other techniques</li> </ul> </li> <li>Scheduling and optimizing disk I/O for performance</li> </ul> </li> </ul> <h3>Design Goals of OS</h3> <ul> <li>Abstraction <ul> <li>Provide a clean, high-level interface to simplify usage</li> <li>Hide details of hardware, low-level resource management</li> </ul> </li> <li>Performance <ul> <li>Efficient utilization of hardware resources</li> <li>Minimize overhead, scale to handle high demand</li> </ul> </li> <li>Isolation <ul> <li>Prevent faults or misbehavior in one program from affecting others</li> <li>Enforce access controls and resource usage limits</li> </ul> </li> <li>Reliability <ul> <li>Must run continuously without crashes or data loss</li> <li>Gracefully handle and recover from hardware/software errors</li> </ul> </li> <li>Other key goals: <ul> <li>Security: Control access, authentication, defend against attacks</li> <li>Energy efficiency: Optimize for power usage on constrained devices</li> <li>Portability: Support a range of hardware platforms and configurations</li> </ul> </li> </ul> </section>
+
+<section> <h2>Chapter 4 - Process Abstraction</h2> <h3>CPU Virtualizing</h3> <ul> <li>The OS provides the illusion that many virtual CPUs exists</li> <li>Time Sharing: Running one process then stopping it then running another <ul> <li>Potential cost is performance</li> <li>Enables concurrent execution of multiple processes</li> </ul> </li> </ul> <h3>Process</h3> <ul> <li>Is a running program</li> <li>Comprises of: <ul> <li>Memory <ul> <li>Instructions</li> <li>Data sections (heap &amp; stack)</li> </ul> </li> <li>Registers <ul> <li>Program Counter: Stores the memory address of the next instruction to be executed</li> <li>Stack Pointer: Points to the top of the process's stack in memory</li> <li>General-purpose registers: Hold temporary data and intermediate results during computation</li> </ul> </li> <li>Open files and network connections</li> </ul> </li> <li>Each process has its own isolated virtual address space</li> </ul> <h3>Process Creation step-by-step</h3> <ol> <li>Load program onto memory &amp; into the address space of the process <ul> <li>Programs initially reside on disk in an executable format</li> <li>OS performs the loading process lazily <ul> <li>Ie, only loads code/data when they are needed during execution</li> </ul> </li> </ul> </li> <li>Allocates the program's run-time stack <ul> <li>Uses the stack for local variables, function parameters, and return addresses</li> <li>Initializes the stack with arguments <ul> <li>Argc &amp; argv: Command-line arguments passed to the program</li> </ul> </li> </ul> </li> <li>Creates the heap <ul> <li>Used for dynamically-allocated data at runtime</li> <li>Such data is requested and freed through system calls such as malloc() and free()</li> </ul> </li> <li>OS does some other initialization tasks <ul> <li>I/O setup <ul> <li>Sets up the three default file descriptors (stdin, stdout, stderr)</li> </ul> </li> <li>Signals: Configures the process's signal handling table</li> </ul> </li> <li>Start program running at entry point <ul> <li>OS transfers control of the CPU to the newly-created process</li> <li>Execution begins at the program's main() function</li> </ul> </li> </ol> <h3>Process States</h3> <ul> <li>A process can be in one of three states: <ul> <li>Running: Process is currently executing on a CPU</li> <li>Ready: Process is ready to run but the OS has not scheduled it on a CPU</li> <li>Blocked: Process is waiting for some event (e.g., I/O completion) and cannot continue executing</li> </ul> </li> <li>State transitions occur based on process behavior and OS scheduling decisions</li> </ul> <figure> <img src="process-state-transition.png" alt="Process State Transition Diagram"> <figcaption>Process State Transition Diagram</figcaption> </figure> <h3>Data Structures</h3> <ul> <li>The OS maintains key data structures to track process information: <ul> <li>Process List: Contains information about all processes in the system <ul> <li>Ready Processes: Processes that are ready to be scheduled on a CPU</li> <li>Blocked Processes: Processes that are blocked waiting for an event</li> <li>Running Process: The process currently executing on the CPU</li> </ul> </li> <li>Register Context: Stores the values of a process's registers when it is not running <ul> <li>Allows the OS to resume a process's execution from where it left off</li> </ul> </li> <li>Process Control Block (PCB): A data structure that contains all the information needed to manage a process <ul> <li>Process ID (PID): Unique identifier for the process</li> <li>Process State: Current state of the process (running, ready, blocked)</li> <li>Program Counter: Address of the next instruction to be executed</li> <li>CPU Registers: Values of the process's registers</li> <li>Memory Management Information: Page tables, memory limits, etc.</li> <li>I/O Status: Open files, pending I/O requests, etc.</li> <li>Accounting Information: CPU time used, scheduling priority, etc.</li> </ul> </li> </ul> </li> </ul> </section>
+
+<section> <h2>Chapter 5 - Process API</h2> <p>The process API provides a set of system calls that allow user programs to interact with the operating system for process management. These system calls enable the creation, control, and coordination of processes.</p>
+
+<h3>Process Creation</h3>
+<p>The <code>fork()</code> system call is used to create a new process by duplicating the calling process.</p>
+<pre><code>pid_t fork(void);</code></pre>
+<ul>
+    <li>The new process, called the child process, is an exact copy of the calling process (the parent process).</li>
+    <li>The child process inherits the parent's memory image, open files, and other resources.</li>
+    <li>The <code>fork()</code> system call returns twice:
+        <ul>
+            <li>In the parent process, it returns the process ID (PID) of the newly created child process.</li>
+            <li>In the child process, it returns 0.</li>
+        </ul>
+    </li>
+    <li>The parent and child processes execute concurrently and independently after the <code>fork()</code> call.</li>
+</ul>
+
+<h3>Process Execution</h3>
+<p>The <code>exec()</code> family of system calls is used to replace the current process image with a new process image.</p>
+<pre><code>int execl(const char *path, const char *arg, ...);
+
+int execlp(const char *file, const char *arg, ...);
+int execle(const char *path, const char *arg, ..., char * const envp[]);
+int execv(const char *path, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+int execvpe(const char *file, char *const argv[], char *const envp[]);</code></pre>
+<ul>
+<li>The <code>exec()</code> system calls load a new program into the current process's memory space, replacing its code, data, and stack.</li>
+<li>The arguments to the <code>exec()</code> system calls specify the path or file name of the executable, along with any command-line arguments and environment variables.</li>
+<li>If the <code>exec()</code> call succeeds, the new program starts executing from its entry point (e.g., <code>main()</code> function).</li>
+<li>If the <code>exec()</code> call fails, control returns to the calling process, and an error code is returned.</li>
+</ul>
+
+<h3>Process Termination</h3>
+<p>Processes can terminate normally by returning from the <code>main()</code> function or by calling the <code>exit()</code> system call.</p>
+<pre><code>void exit(int status);</code></pre>
+<ul>
+    <li>The <code>exit()</code> system call terminates the calling process and returns a status value to the parent process.</li>
+    <li>The parent process can retrieve the status value using the <code>wait()</code> or <code>waitpid()</code> system calls.</li>
+</ul>
+
+<h3>Process Synchronization</h3>
+<p>The <code>wait()</code> and <code>waitpid()</code> system calls are used by a parent process to synchronize with the termination of its child processes.</p>
+<pre><code>pid_t wait(int *wstatus);
+
+pid_t waitpid(pid_t pid, int *wstatus, int options);</code></pre>
+<ul>
+<li>The <code>wait()</code> system call suspends the execution of the calling process until one of its child processes terminates.</li>
+<li>The <code>waitpid()</code> system call allows the parent process to wait for a specific child process or to control the behavior of the wait operation.</li>
+<li>The exit status of the terminated child process is returned through the <code>wstatus</code> parameter.</li>
+</ul>
+
+<h3>Interprocess Communication (IPC)</h3>
+<p>The process API provides various mechanisms for interprocess communication, allowing processes to exchange data and synchronize their activities. Some common IPC mechanisms include:</p>
+<ul>
+    <li>Pipes: Unidirectional communication channels between processes.</li>
+    <li>Named Pipes (FIFOs): Bidirectional communication channels identified by a pathname in the file system.</li>
+    <li>Sockets: Communication endpoints that enable processes to communicate over a network.</li>
+    <li>Shared Memory: Allows processes to share a region of memory for efficient data exchange.</li>
+    <li>Message Queues: Provide a message-based communication mechanism between processes.</li>
+    <li>Semaphores: Used for process synchronization and resource sharing.</li>
+</ul>
+
+<p>These IPC mechanisms are provided through various system calls and APIs specific to each operating system.</p>
+
+</section>
+
+<section> <h2>Chapter 6 - CPU Scheduling</h2>
+
+<h3>Direct Execution</h3>
+<ul>
+    <li>Allows the program to directly run on the CPU without limits</li>
+    <li>Issue: OS would be relegated to just a library without any control over system resources</li>
+</ul>
+
+<h3>User Mode &amp; Kernel Mode</h3>
+<ul>
+    <li>User mode: Applications execute with limited permissions and access to system resources</li>
+    <li>Kernel mode: The OS executes with full control and unrestricted access to hardware and system resources</li>
+    <li>Transitions between modes:
+        <ul>
+            <li>System calls, interrupts, and exceptions cause a switch from user mode to kernel mode</li>
+            <li>The OS carefully validates and handles these events to maintain system stability and security</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>System Calls &amp; Modes</h3>
+<ul>
+    <li>System calls allow user programs to request services and access resources managed by the OS</li>
+    <li>Examples of system calls:
+        <ul>
+            <li>Process management: Creating and controlling processes</li>
+            <li>File management: Reading, writing, and manipulating files</li>
+            <li>Device management: Accessing and controlling hardware devices</li>
+        </ul>
+    </li>
+    <li>Trap instruction: Raises the privilege level to kernel mode and transfers control to the OS</li>
+    <li>Return-from-trap instruction: Lowers the privilege level back to user mode and returns control to the calling user program</li>
+</ul>
+
+<h3>Limited Direction Execution Protocol</h3>
+<figure>
+    <img src="limited-direct-execution.png" alt="Limited Direction Execution Protocol Diagram">
+    <figcaption>Limited Direction Execution Protocol Diagram</figcaption>
+</figure>
+<ul>
+    <li>Cooperative approach: User processes voluntarily yield control to the OS through system calls</li>
+    <li>Non-cooperative approach: The OS employs a timer interrupt to regain control and make scheduling decisions</li>
+</ul>
+
+<h3>Cooperative Approach to sharing CPU</h3>
+<ul>
+    <li>User process periodically gives up the CPU through system calls</li>
+    <li>The OS may then decide to run another task</li>
+    <li>Issue: An infinite loop in a user process can lead to system unresponsiveness</li>
+</ul>
+
+<h3>Non-Cooperative approach</h3>
+<ul>
+    <li>Timer interrupt: The OS configures a hardware timer to generate interrupts at regular intervals</li>
+    <li>When an interrupt occurs:
+        <ul>
+            <li>The current running process is halted</li>
+            <li>The OS saves the process's state</li>
+            <li>The OS invokes its interrupt handler to make scheduling decisions</li>
+        </ul>
+    </li>
+    <li>The timer interrupt allows the OS to regain control without relying on user processes</li>
+</ul>
+
+<h3>Saving and restoring context</h3>
+<ul>
+    <li>The scheduler determines whether to continue executing the current process or switch to a different one</li>
+    <li>If a context switch is required:
+        <ul>
+            <li>The OS saves the current process's state (register values, program counter, etc.)</li>
+            <li>The OS restores the state of the next process to be executed</li>
+            <li>The OS switches to the kernel stack of the next process</li>
+        </ul>
+    </li>
+    <li>Context switches are performed using low-level assembly code to ensure efficiency and correctness</li>
+</ul>
+
+<h3>Concurrency issues</h3>
+<ul>
+    <li>Race conditions can occur when multiple processes or interrupts access shared resources concurrently</li>
+    <li>The OS employs synchronization mechanisms to coordinate access to shared data structures
+        <ul>
+            <li>Disabling interrupts during critical sections</li>
+            <li>Using locks and synchronization primitives to enforce mutual exclusion</li>
+        </ul>
+    </li>
+    <li>Careful design and implementation are necessary to maintain system stability and avoid concurrency bugs</li>
+</ul>
+
+</section>
+
+<section> <h2>Chapter 7 - Scheduling: Introduction</h2>
+
+<h3>Workload assumptions for examples</h3>
+<ol>
+    <li>Run-time for each job is the same</li>
+    <li>All jobs arrive at the same time</li>
+    <li>All jobs only use the CPU and won't request I/O</li>
+    <li>Run-time for each job is known</li>
+</ol>
+
+<h3>Scheduling Metrics</h3>
+<ul>
+    <li>Turnaround Time: T(turnaround) = T(completion) - T(arrival)
+        <ul>
+            <li>Measures the total time from job arrival to completion</li>
+            <li>Includes waiting time and actual execution time</li>
+        </ul>
+    </li>
+    <li>Response Time: T(response) = T(first run) - T(arrival)
+        <ul>
+            <li>Measures the time from job arrival to its first execution</li>
+            <li>Reflects the system's responsiveness and interactivity</li>
+        </ul>
+    </li>
+    <li>Fairness: Ensures fair allocation of CPU time among jobs
+        <ul>
+            <li>Prevents starvation and ensures progress for all jobs</li>
+            <li>Balances performance and equality considerations</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>First in, First out (FIFO) / First Come, First Serve (FCFS)</h3>
+<ul>
+    <li>Jobs are executed in the order of their arrival</li>
+    <li>Simple and easy to implement</li>
+    <li>Convoy effect:
+        <ul>
+            <li>If one job runs longer than the others and runs first, all other jobs must wait until the first and long job finishes</li>
+            <li>Can lead to poor average turnaround time and responsiveness</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Shortest Job First (SJF)</h3>
+<ul>
+    <li>Jobs are executed in order of their run-time, shortest job first</li>
+    <li>Optimizes average turnaround time</li>
+    <li>Issue:
+        <ul>
+            <li>If multiple jobs arrive at different times, the first job runs to completion regardless of the runtime of newly arrived jobs</li>
+            <li>Can lead to starvation of longer jobs</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Shortest Time-to-Completion First (STCF)</h3>
+<ul>
+    <li>An extension of SJF that considers the remaining time of currently executing jobs</li>
+    <li>When a new job arrives, the scheduler compares its runtime with the remaining time of the currently running job
+        <ul>
+            <li>If the new job has a shorter time-to-completion, it preempts the currently running job</li>
+            <li>Otherwise, the currently running job continues execution</li>
+        </ul>
+    </li>
+    <li>Improves average turnaround time compared to SJF</li>
+    <li>Poor response time for longer jobs that may be repeatedly preempted</li>
+</ul>
+
+<h3>Round Robin Scheduling / Time Slicing Scheduling</h3>
+<ul>
+    <li>Uses time slices (scheduling quantum) to allocate CPU time</li>
+    <li>Each job is given a fixed time slice to execute
+        <ul>
+            <li>If the job completes within the time slice, it releases the CPU voluntarily</li>
+            <li>If the job does not complete, it is preempted at the end of the time slice and added to the end of the run queue</li>
+        </ul>
+    </li>
+    <li>The scheduler moves on to the next job in the run queue</li>
+    <li>Ensures fair allocation of CPU time and prevents starvation</li>
+    <li>Provides good response time but may have higher average turnaround time compared to other algorithms</li>
+</ul>
+
+<h3>Importance of Length of Time Slice</h3>
+<ul>
+    <li>Shorter time slice:
+        <ul>
+            <li>Better response time as jobs are given more frequent opportunities to execute</li>
+            <li>Worse overall performance due to increased context switching overhead</li>
+        </ul>
+    </li>
+    <li>Longer time slice:
+        <ul>
+            <li>Worse response time as jobs may wait longer for their turn to execute</li>
+            <li>Better overall performance due to reduced context switching overhead</li>
+        </ul>
+    </li>
+    <li>The choice of time slice length depends on the system's requirements and workload characteristics</li>
+</ul>
+
+<h3>Incorporating I/O</h3>
+<ul>
+    <li>When a job initiates an I/O request, it is blocked and placed in a waiting state until the I/O operation completes</li>
+    <li>The scheduler can optimize CPU utilization by selecting another ready job to execute while the I/O operation is in progress</li>
+    <li>When the I/O operation completes:
+        <ul>
+            <li>An interrupt is raised to notify the OS</li>
+            <li>The OS moves the blocked job from the waiting state to the ready state</li>
+            <li>The job becomes eligible for scheduling again</li>
+        </ul>
+    </li>
+    <li>Incorporating I/O allows for better utilization of system resources and improved overall performance</li>
+</ul>
+
+</section>
+
+<h1>Memory Virtualization (Chapters 13-15):</h1>
+<p>A key concept in operating systems is memory virtualization - the OS presents each process with the illusion that it has a large contiguous address space to itself, when in reality the OS is mapping the virtual addresses used by the process to physical locations in memory that may be scattered around.</p>
+<p>Every address referenced by a running program is a virtual address that the OS and hardware memory management unit (MMU) translate to a physical address behind the scenes. So the 24th virtual address may map to a completely different physical memory location.</p>
+<p>This virtualization makes programming easier (no need to worry about physical memory layout), utilizes memory more efficiently (unused virtual addresses don't take up physical space), and isolates processes for security/stability (one process can't access another's memory).</p>
+<p>The OS and hardware collaborate to implement virtual memory:</p>
+<ul>
+    <li>The OS manages the mappings of virtual to physical addresses and handles allocation.</li>
+    <li>The hardware MMU performs the translation of each memory access using page tables.</li>
+    <li>Translation lookaside buffers (TLBs) cache recent translations for speed.</li>
+</ul>
+<p>On a 32-bit system, pointers to data like integers are 4 bytes in size. On a 64-bit system, pointers are 8 bytes, even though the pointed-to data type may be smaller. The full pointer width is used to be able to address the entire virtual address space.</p>
+
+section> <h2>Chapter 16 - Segmentation</h2>
+
+<h3>Understanding Memory Sizes</h3>
+<ul>
+    <li>4 Kb (Kilobits) = 4 * 1024 bits = 4096 bits</li>
+    <li>64 Kb (Kilobits) = 65,536 bits = 4096 + 2048 bits</li>
+</ul>
+
+<h3>Inefficiency of the Base-Bound Approach</h3>
+<ul>
+    <li>Contains a large range of free space between the heap and stack segments
+        <ul>
+            <li>This free space still occupies physical memory</li>
+            <li>Leads to inefficient memory utilization</li>
+        </ul>
+    </li>
+    <li>Difficult to run programs when the address space doesn't fit into available physical memory</li>
+</ul>
+
+<h3>Segmentation</h3>
+<ul>
+    <li>A segment is a contiguous portion of the address space
+        <ul>
+            <li>Each segment has a specific length</li>
+            <li>Segments represent logically different parts of a program, such as code, stack, and heap</li>
+        </ul>
+    </li>
+    <li>Segments can be placed in different parts of physical memory
+        <ul>
+            <li>Each segment has its own base and bound values</li>
+            <li>Allows for flexibility in memory allocation</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Placing Segments in Physical Memory</h3>
+<figure>
+    <img src="segmentation.png" alt="Placing Segments in Physical Memory">
+    <figcaption>Example of placing segments in physical memory</figcaption>
+</figure>
+
+<h3>Address Translation with Segmentation</h3>
+<ul>
+    <li>Physical Address = Offset + Base
+        <ul>
+            <li>The offset value represents the distance from the segment's base address</li>
+            <li>The offset is relative to the segment's base, not the virtual address</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Segmentation Fault or Violation</h3>
+<ul>
+    <li>Occurs when an illegal address is referenced
+        <ul>
+            <li>Illegal addresses are outside the valid range of the address space</li>
+        </ul>
+    </li>
+    <li>Hardware detects when an address is out of bounds and raises a segmentation fault</li>
+</ul>
+
+<h3>Referring to a Segment</h3>
+<ul>
+    <li>Explicit Approach: The virtual address is divided into two parts
+        <ul>
+            <li>The first few bits identify the segment number</li>
+            <li>The remaining bits represent the offset within the segment</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Referring to the Stack Segment</h3>
+<ul>
+    <li>The stack segment grows backwards (towards lower addresses)</li>
+    <li>Extra hardware support is required to handle stack segment references
+        <ul>
+            <li>A bit is used to determine the growth direction of the segment</li>
+            <li>1 indicates positive growth (towards higher addresses)</li>
+            <li>0 indicates negative growth (towards lower addresses)</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Support for Sharing Address Space</h3>
+<ul>
+    <li>Segments can be shared between different address spaces
+        <ul>
+            <li>Code sharing is commonly used in modern systems</li>
+        </ul>
+    </li>
+    <li>Extra hardware support is needed in the form of protection bits
+        <ul>
+            <li>Additional bits per segment to specify read, write, and execute permissions</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Fine-Grained vs. Coarse-Grained Segmentation</h3>
+<ul>
+    <li>Coarse-Grained Segmentation: Address space is divided into a few large segments</li>
+    <li>Fine-Grained Segmentation: Address space is divided into many smaller segments
+        <ul>
+            <li>Provides flexibility and granularity in memory management</li>
+            <li>Requires hardware support in the form of a segment table</li>
+            <li>Commonly used in early systems with scarce resources</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>OS Support: Fragmentation</h3>
+<ul>
+    <li>External Fragmentation: Occurs when there are small gaps of free space between allocated segments
+        <ul>
+            <li>Makes it difficult to allocate new segments even though sufficient total free space exists</li>
+            <li>Example: OS receives a request for 10 KB, but no contiguous segment of that size is available</li>
+        </ul>
+    </li>
+    <li>Compaction: Rearranges existing segments in physical memory to reduce fragmentation
+        <ul>
+            <li>Involves stopping the running process to allow the CPU to perform compaction</li>
+            <li>Requires copying data from one memory location to another</li>
+            <li>Necessitates updating the segment register values to reflect the new segment locations</li>
+        </ul>
+    </li>
+</ul>
+
+</section>
+
+<section> <h2>Chapter 17 - Free Space Management</h2>
+
+<h3>Contiguous Memory Allocation</h3>
+<ul>
+    <li>Segments require a contiguous region of memory for allocation</li>
+    <li>In modern 64-bit systems, a pointer to any data type is typically 8 bytes wide
+        <ul>
+            <li>This is because memory addresses are 64 bits wide</li>
+            <li>Pointers store memory addresses, so they need to be wide enough to accommodate 64-bit values</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Splitting</h3>
+<ul>
+    <li>When the OS finds a free chunk of memory larger than the requested size, it splits the chunk into two parts
+        <ul>
+            <li>One part is allocated to satisfy the memory request</li>
+            <li>The other part remains as a smaller free chunk</li>
+        </ul>
+    </li>
+    <li>Splitting helps minimize internal fragmentation by allocating only the required amount of memory</li>
+</ul>
+
+<h3>Coalescing</h3>
+<ul>
+    <li>When the OS finds multiple adjacent free chunks that can collectively satisfy a memory request, it combines them into a single larger chunk
+        <ul>
+            <li>Coalescing helps create larger contiguous free regions</li>
+            <li>It reduces external fragmentation by merging small free chunks</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Tracking the Size of Allocated Regions</h3>
+<ul>
+    <li>The <code>free(void *ptr)</code> function does not receive the size of the memory region to be freed as a parameter</li>
+    <li>Allocators store additional information in a header block to keep track of the size
+        <ul>
+            <li>The header block is placed immediately before the allocated memory chunk</li>
+            <li>It contains metadata about the chunk, such as its size</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Header Block of the Allocated Memory Chunk</h3>
+<ul>
+    <li>The header block contains at least the size of the allocated memory region</li>
+    <li>It may also include:
+        <ul>
+            <li>Additional pointers to other associated memory chunks</li>
+            <li>A magic number for integrity checking</li>
+        </ul>
+    </li>
+    <li>The presence of the header block affects the total size of the free region
+        <ul>
+            <li>The size of a free region is the sum of the header size and the actual allocated space</li>
+            <li>When a user process requests N bytes, the allocator searches for a free chunk of size N plus the header size</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Embedding a Free List: The List Itself</h3>
+<ul>
+    <li>The memory allocation library initializes the heap and embeds the first element of the free list in the free space
+        <ul>
+            <li>The free list cannot be built using <code>malloc()</code> within the heap itself</li>
+            <li>The first element of the free list encompasses the entire heap</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Embedding a Free List: Allocation</h3>
+<ul>
+    <li>When a chunk of memory is requested, the allocator finds a large enough free chunk to accommodate the request</li>
+    <li>The allocator performs the following steps:
+        <ul>
+            <li>Splits the large free chunk into two parts
+                <ul>
+                    <li>One part is used to fulfill the allocation request</li>
+                    <li>The other part remains as a smaller free chunk</li>
+                </ul>
+            </li>
+            <li>Updates the size of the free chunk in the free list</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Freeing Space with <code>free()</code></h3>
+<ul>
+    <li>When the <code>free()</code> function is called, the memory chunk specified by the argument is placed back into the free list</li>
+    <li>The allocator updates the free list to include the freed chunk</li>
+</ul>
+
+<h3>Free Space with Freed Chunks</h3>
+<ul>
+    <li>External fragmentation occurs when there are small gaps of free space between allocated chunks</li>
+    <li>Coalescing is performed on the free list to merge adjacent free chunks and create larger contiguous free regions</li>
+</ul>
+
+<h3>Growing the Heap</h3>
+<ul>
+    <li>Most allocators start with a small initial heap size</li>
+    <li>When the heap runs out of free space, the allocator requests more memory from the OS to expand the heap
+        <ul>
+            <li>This is typically done using system calls like <code>sbrk()</code> or <code>mmap()</code></li>
+            <li>The newly allocated memory is added to the free list for future allocations</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Managing Free Space: Basic Strategies</h3>
+<ul>
+    <li>Best-fit: Allocates from the smallest free chunk that is large enough to satisfy the request
+        <ul>
+            <li>Minimizes wasted space but may lead to more fragmentation</li>
+        </ul>
+    </li>
+    <li>Worst-fit: Allocates from the largest free chunk available
+        <ul>
+            <li>Leaves larger free chunks after allocation but may waste more space</li>
+        </ul>
+    </li>
+    <li>First-fit: Allocates from the first free chunk that is large enough to satisfy the request
+        <ul>
+            <li>Simple and efficient but may lead to a mix of fragmentation and wasted space</li>
+        </ul>
+    </li>
+    <li>Next-fit: Similar to first-fit but starts the search from the last allocation point
+        <ul>
+            <li>Spreads allocations evenly throughout the heap</li>
+        </ul>
+    </li>
+</ul>
+
+</section>
+
+<h1>Advanced memory management (Chapters 18-21):</h1>
+<p>Modern systems use paging to implement virtual memory instead of the simpler base-and-bounds or segmentation schemes used in the past.</p>
+<p>The virtual and physical address spaces are divided into fixed-size pages (often 4KB). Each virtual page maps to a physical page frame.</p>
+<p>The virtual address is split into a virtual page number (VPN) and page offset. The VPN is translated to a physical frame number (PFN) while the offset stays the same.</p>
+<p>The page size determines the split - with 4KB pages and 32-bit addresses, the lower 12 bits are the offset (2^12 = 4096) and the upper 20 bits are the VPN. Larger pages like 8KB or 16KB would use more offset bits and fewer VPN bits.</p>
+<p>Page tables store the VPN to PFN mappings. They can get large, so are stored in physical memory. A page table register points to the start of the table. If the page tables were contiguous, the page table size would be 4MB for a 32-bit address space (2^20 VPN entries * 4 bytes per entry). In practice, multi-level and hashed page tables are used for efficiency.</p>
+<p>TLBs are implemented in hardware to cache frequently used mappings for fast translation. On a TLB miss, the page tables in memory are referenced to retrieve the translation, at a cost of tens to hundreds of clock cycles. TLB misses are costly, so a high hit rate is essential for performance.</p>
+<p>To handle the case when the total memory used by processes exceeds physical memory, the OS uses swapping. It can evict infrequently used pages to secondary storage to free up physical frames. Complex replacement policies are used to decide which pages to evict and when, such as Least Recently Used (LRU), CLOCK, etc.</p>
+<p>If too much swapping occurs, the system can enter a state of thrashing where it spends most of its time swapping pages in and out instead of doing useful work. Careful management is required for performance when oversubscribing memory.</p>
+
+</body>
+</html>
+
